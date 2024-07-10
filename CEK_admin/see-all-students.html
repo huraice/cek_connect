@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Details - Teacher Portal</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Student Details</h1>
+        <nav id="menu-bar">
+            <a href="teacher.html">Back to Teacher Portal</a>
+        </nav>
+    </header>
+    <main>
+        <section id="student-details-section">
+            <h2>Student Details</h2>
+            <div id="student-details">
+                <!-- Student details will be inserted here by JavaScript -->
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 connect.cek. All rights reserved.</p>
+    </footer>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore-compat.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+    apiKey: "AIzaSyD6IXHqc7dK7qXLc8Hg7AMctcC5u2r0T-o",
+    authDomain: "alumini-app-4c93b.firebaseapp.com",
+    projectId: "alumini-app-4c93b",
+    storageBucket: "alumini-app-4c93b.appspot.com",
+    messagingSenderId: "546053548821",
+     appId: "1:546053548821:web:12af4e4c33dbed7163d71c",
+     measurementId: "G-D292WKX6BS"
+};
+
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+
+            if (id) {
+                db.collection('profiles').doc(id).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        document.getElementById('student-details').innerHTML = `
+                            <p><strong>Name:</strong> ${data.name}</p>
+                            <p><strong>Email:</strong> ${data.email}</p>
+                            <p><strong>Branch:</strong> ${data.branch}</p>
+                            <p><strong>Admission ID:</strong> ${data.admissionId}</p>
+                            <button onclick="verifyStudent('${doc.id}')">Verify</button>
+                            <button onclick="removeStudent('${doc.id}')">Remove</button>
+                        `;
+                    } else {
+                        document.getElementById('student-details').innerHTML = '<p>No details found.</p>';
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error fetching student details:', error);
+                });
+            }
+        });
+
+        function verifyStudent(id) {
+            db.collection('profiles').doc(id).update({
+                verified: true
+            })
+            .then(() => {
+                alert('Student verified successfully!');
+                window.location.href = 'teacher.html'; // Redirect to teacher portal
+            })
+            .catch((error) => {
+                console.error('Error verifying student:', error);
+            });
+        }
+
+        function removeStudent(id) {
+            db.collection('profiles').doc(id).delete()
+            .then(() => {
+                alert('Student removed successfully!');
+                window.location.href = 'teacher.html'; // Redirect to teacher portal
+            })
+            .catch((error) => {
+                console.error('Error removing student:', error);
+            });
+        }
+    </script>
+</body>
+</html>

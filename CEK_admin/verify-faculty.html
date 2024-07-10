@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Teachers Portal</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Admin Panel</h1>
+        <nav id="menu-bar">
+            <a href="index.html">Home</a>
+            <a href="logout.html">Logout</a>
+        </nav>
+    </header>
+    <main>
+        <section id="admin-panel-section">
+            <h2>Faculty Approval</h2>
+            <table id="faculty-list">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                        <th>Position</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Faculty rows will be inserted here by JavaScript -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 connect.cek. All rights reserved.</p>
+    </footer>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore-compat.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+    apiKey: "AIzaSyD6IXHqc7dK7qXLc8Hg7AMctcC5u2r0T-o",
+    authDomain: "alumini-app-4c93b.firebaseapp.com",
+    projectId: "alumini-app-4c93b",
+    storageBucket: "alumini-app-4c93b.appspot.com",
+    messagingSenderId: "546053548821",
+     appId: "1:546053548821:web:12af4e4c33dbed7163d71c",
+     measurementId: "G-D292WKX6BS"
+};
+
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const facultyList = document.querySelector('#faculty-list tbody');
+
+            // Fetch unverified faculty members
+            db.collection('profiles')
+                .where('verified', '==', false)
+                .get()
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        const row = document.createElement('tr');
+
+                        row.innerHTML = `
+                            <td>${data.name}</td>
+                            <td>${data.email}</td>
+                            <td>${data.department}</td>
+                            <td>${data.position}</td>
+                            <td>
+                                <button onclick="viewDetails('${doc.id}')">Details</button>
+                                <button onclick="approveFaculty('${doc.id}')">Approve</button>
+                                <button onclick="rejectFaculty('${doc.id}')">Reject</button>
+                            </td>
+                        `;
+
+                        facultyList.appendChild(row);
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error fetching faculty members:', error);
+                });
+        });
+
+        function viewDetails(id) {
+            // Redirect to details page (implement as needed)
+            window.location.href = `faculty-details.html?id=${id}`;
+        }
+
+        function approveFaculty(id) {
+            db.collection('profiles').doc(id).update({
+                verified: true
+            })
+            .then(() => {
+                alert('Faculty approved successfully!');
+                window.location.reload(); // Refresh the page to update the list
+            })
+            .catch((error) => {
+                console.error('Error approving faculty:', error);
+            });
+        }
+
+        function rejectFaculty(id) {
+            db.collection('profiles').doc(id).delete()
+            .then(() => {
+                alert('Faculty rejected and deleted!');
+                window.location.reload(); // Refresh the page to update the list
+            })
+            .catch((error) => {
+                console.error('Error rejecting faculty:', error);
+            });
+        }
+    </script>
+</body>
+</html>

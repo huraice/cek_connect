@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logout - Teachers Portal</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Logout</h1>
+        <nav id="menu-bar">
+            <a href="index.html">Home</a>
+        </nav>
+    </header>
+    <main>
+        <section id="logout-section">
+            <h2>Are you sure you want to log out?</h2>
+            <button id="logout-button">Logout</button>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 connect.cek. All rights reserved.</p>
+    </footer>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-auth-compat.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+    apiKey: "AIzaSyD6IXHqc7dK7qXLc8Hg7AMctcC5u2r0T-o",
+    authDomain: "alumini-app-4c93b.firebaseapp.com",
+    projectId: "alumini-app-4c93b",
+    storageBucket: "alumini-app-4c93b.appspot.com",
+    messagingSenderId: "546053548821",
+     appId: "1:546053548821:web:12af4e4c33dbed7163d71c",
+     measurementId: "G-D292WKX6BS"
+};
+
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        document.getElementById('logout-button').addEventListener('click', () => {
+            auth.signOut()
+                .then(() => {
+                    // Redirect to login page after successful logout
+                    window.location.href = 'login.html';
+                })
+                .catch((error) => {
+                    console.error('Error signing out: ', error);
+                });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Teachers Portal</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Sign Up for Teachers Portal</h1>
+        <nav id="menu-bar">
+            <a href="index.html">Home</a>
+            <a href="login.html">Login</a>
+            <a href="contact.html">Contact Us</a>
+        </nav>
+    </header>
+    <main>
+        <section id="signup-section">
+            <h2>Teacher Sign Up</h2>
+            <form id="signup-form">
+                <input type="email" id="signup-email" placeholder="Email" required>
+                <input type="password" id="signup-password" placeholder="Password" required>
+                <input type="text" id="signup-name" placeholder="Full Name" required>
+                <input type="text" id="signup-department" placeholder="Department" required>
+                <input type="text" id="signup-position" placeholder="Position" required>
+                <button type="submit">Sign Up</button>
+            </form>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 connect.cek. All rights reserved.</p>
+    </footer>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore-compat.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.getElementById('signup-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const name = document.getElementById('signup-name').value;
+            const department = document.getElementById('signup-department').value;
+            const position = document.getElementById('signup-position').value;
+
+            firebase.auth().createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Add additional user data to Firestore
+                    const user = userCredential.user;
+                    db.collection('profiles').doc(user.uid).set({
+                        name: name,
+                        email: email,
+                        department: department,
+                        position: position,
+                        verified: false
+                    })
+                    .then(() => {
+                        alert('Sign up successful! Redirecting to login page.');
+                        window.location.href = 'login.html';
+                    })
+                    .catch((error) => {
+                        alert('Error: ' + error.message);
+                    });
+                })
+                .catch((error) => {
+                    alert('Error: ' + error.message);
+                });
+        });
+    </script>
+</body>
+</html>

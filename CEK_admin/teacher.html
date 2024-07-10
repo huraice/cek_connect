@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Portal - Recent Activities</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Teacher Portal</h1>
+        <nav id="menu-bar">
+            <a href="index.html">Home</a>
+            <a href="profile.html">Profile</a>
+            <a href="settings.html">Settings</a>
+            <a href="recent-activities.html">Recent Activities</a>
+        </nav>
+    </header>
+    <main>
+        <section id="recent-posts">
+            <h2>Recent Posts</h2>
+            <ul id="posts-list">
+                <!-- Recent posts will be inserted here by JavaScript -->
+            </ul>
+        </section>
+        <section id="recent-students">
+            <h2>Recently Joined Students</h2>
+            <ul id="students-list">
+                <!-- Recently joined students will be inserted here by JavaScript -->
+            </ul>
+            <a href="see-all-students.html">See All</a>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 connect.cek. All rights reserved.</p>
+    </footer>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore-compat.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const postsList = document.querySelector('#posts-list');
+            const studentsList = document.querySelector('#students-list');
+
+            // Fetch recent posts
+            db.collection('posts')
+                .orderBy('date', 'desc')
+                .limit(10)
+                .get()
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <p><strong>Title:</strong> ${data.title}</p>
+                            <p>${data.content}</p>
+                            <button onclick="deletePost('${doc.id}')">Delete</button>
+                        `;
+                        postsList.appendChild(li);
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error fetching posts:', error);
+                });
+
+            // Fetch recently joined students
+            db.collection('profiles')
+                .where('role', '==', 'student')
+                .orderBy('joinDate', 'desc')
+                .limit(5)
+                .get()
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <p><strong>Name:</strong> <a href="student-details.html?id=${doc.id}">${data.name}</a></p>
+                            <button onclick="verifyStudent('${doc.id}')">Verify</button>
+                            <button onclick="removeStudent('${doc.id}')">Remove</button>
+                        `;
+                        studentsList.appendChild(li);
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error fetching students:', error);
+                });
+        });
+
+        function deletePost(id) {
+            db.collection('posts').doc(id).delete()
+                .then(() => {
+                    alert('Post deleted successfully!');
+                    window.location.reload(); // Refresh the page to update the list
+                })
+                .catch((error) => {
+                    console.error('Error deleting post:', error);
+                });
+        }
+
+        function verifyStudent(id) {
+            db.collection('profiles').doc(id).update({
+                verified: true
+            })
+            .then(() => {
+                alert('Student verified successfully!');
+                window.location.reload(); // Refresh the page to update the list
+            })
+            .catch((error) => {
+                console.error('Error verifying student:', error);
+            });
+        }
+
+        function removeStudent(id) {
+            db.collection('profiles').doc(id).delete()
+                .then(() => {
+                    alert('Student removed successfully!');
+                    window.location.reload(); // Refresh the page to update the list
+                })
+                .catch((error) => {
+                    console.error('Error removing student:', error);
+                });
+        }
+    </script>
+</body>
+</html>
